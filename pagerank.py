@@ -1,3 +1,5 @@
+import numpy
+
 class PageRank(object):
     OUTPUT_FILENAME = "page_ranks.txt"
     DELTA_CANCEL = 0.04
@@ -90,16 +92,6 @@ class PageRank(object):
                 probability = (probability * self.daempfung) + (self.teleportation / size)
                 mtx[i][j] = probability
         return mtx
-
-    # Berechnet Produkt zweier Vektoren
-    def multiply(self, vec1, vec2):
-        size = len(vec1)
-        sum = 0
-
-        for i in range(size):
-            sum += vec1[i] * vec2[i]
-        return sum
-
 
     # Berechnet Delta-Wert anhand zweier Vektoren
     def calcDelta(self, vec1, vec2):
@@ -197,18 +189,12 @@ class PageRank(object):
 
         # solange der errechnete delta-Wert größer als Abbruchbedingung ist
         while delta > self.DELTA_CANCEL:
-
             # delta resetten
             delta = 0
             pageRanks.append([])
-            # für jede Seite Pi
-            #print(pageRanks)
-            for pi in range(pageCount):
-                v1 = transMatrix[pi]
-                v2 = pageRanks[step][0:8]
-                vecResult = self.multiply(v1, v2)
-                pageRanks[step + 1].append(vecResult)
-
+            # TransitionsMatrix * vektor alter Pagerank = neuer Pagerank
+            newRank = numpy.dot(transMatrix, pageRanks[step][0:8])
+            pageRanks[step + 1] = newRank.tolist()
             delta = self.calcDelta(pageRanks[step+1][0:8], pageRanks[step][0:8])
             pageRanks[step + 1].append(delta)
             step += 1
