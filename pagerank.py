@@ -1,12 +1,12 @@
 class PageRank(object):
     OUTPUT_FILENAME = "page_ranks.txt"
+    DELTA_CANCEL = 0.04
 
     # standard konstruktor, werte wie in aufgabe vorgegeben
     def __init__(self):
         self.daempfung = 0.95
         self.teleportation = 0.05
-        # delta-Schwellwert zum Abbruch
-        self.deltaCancel = 0.04
+
 
     # test matrix erstellen und zurückgeben
     def generateMatrix(self):
@@ -70,9 +70,48 @@ class PageRank(object):
         file.write(pRankString)
         file.close()
 
-    # main Funktion zur PageRank Berechnung
+    # wandelt die Adjazensmatrix in eine Transitionsmatrix um
+    # erwartet Adjazensmatrix
+    def getTransitionMatrix(self, mtx):
+        size = len(mtx)
+        links = self.checkLinks(mtx)
+
+        # matrix durchiterieren
+        for i in range(size):
+            for j in range(size):
+                probability = 0
+                # wenn page j auf page i verweist
+                if j in links[i][1]:
+                    probability = 1 / len(links[j][0])
+                # wenn page j nicht auf page i verweist und es keine outlinks gibt
+                elif j not in links[i][0] and len(links[j][0]) == 0:
+                    probability = 1 / size
+
+                probability = (probability * self.daempfung) + (self.teleportation / size)
+                mtx[i][j] = probability
+        return mtx
+
+    # Berechnet Produkt zweier Vektoren
+    def multiply(self, vec1, vec2):
+        size = len(vec1)
+        sum = 0
+
+        for i in range(size):
+            sum += vec1[i] * vec2[i]
+        return sum
+
+
+    # Berechnet Delta-Wert anhand zweier Vektoren
+    def calcDelta(self, vec1, vec2):
+        result = 0
+        size = len(vec1)
+        for i in range(size):
+            result += abs(vec1[i] - vec2[i])
+        return result
+
+    # Funktion zur PageRank Berechnung mittels Graphen
     # erwartet eine Matrix als Parameter
-    def getPageRank(self, mtx):
+    def getPageRankGraph(self, mtx):
         # Matrix für PageRank Ergebnisse
         pageRanks = [[]]
         # Seitenzahl
@@ -93,7 +132,7 @@ class PageRank(object):
         step = 0
 
         # solange der errechnete delta-Wert größer als Abbruchbedingung ist
-        while delta > self.deltaCancel:
+        while delta > self.DELTA_CANCEL:
             # delta resetten
             delta = 0
             pageRanks.append([])
@@ -133,6 +172,58 @@ class PageRank(object):
         # Ergebnis zurückgeben
         return pageRanks
 
+
+    # Funktion zur PageRank Berechnung mittels Wahrscheinlichkeitsmatrix
+    # erwartet matrix als parameter
+    def getPageRankMatrix(self, mtx):
+        # Matrix für PageRank Ergebnisse
+        pageRanks = [[]]
+        # Seitenzahl
+        pageCount = len(mtx)
+
+        # Transitionmatrix bestimmen
+        transMatrix = self.getTransitionMatrix(mtx)
+
+        # pageRanks initialisieren
+        for i in range(pageCount):
+            # Initialwert = 1 / Seitenzahl
+            pageRanks[0].append(1.0 / pageCount)
+        # delta startwert hinzufügen für einfachere Formatierung später
+        pageRanks[0].append(0)
+
+        # delta und step initialisieren
+        delta = 1
+        step = 0
+
+        # solange der errechnete delta-Wert größer als Abbruchbedingung ist
+        while delta > self.DELTA_CANCEL:
+
+            # delta resetten
+            delta = 0
+            pageRanks.append([])
+            # für jede Seite Pi
+            #print(pageRanks)
+            for pi in range(pageCount):
+                v1 = transMatrix[pi]
+                v2 = pageRanks[step][0:8]
+                vecResult = self.multiply(v1, v2)
+                pageRanks[step + 1].append(vecResult)
+
+            delta = self.calcDelta(pageRanks[step+1][0:8], pageRanks[step][0:8])
+            pageRanks[step + 1].append(delta)
+            step += 1
+
+        # Ergebnis formatieren
+        output = self.formatOutput(pageRanks)
+        # Ergebnis ausgeben
+        print(output)
+        # Ergebnis in lokale Datei speichern
+        self.saveToFile(self.OUTPUT_FILENAME, output)
+        # Ergebnis zurückgeben
+        return pageRanks
+
 p = PageRank()
 matrix = p.generateMatrix()
-p.getPageRank(matrix)
+p.getPageRankMatrix(matrix)
+#p.getPageRankGraph(matrix)
+
