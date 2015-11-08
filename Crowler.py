@@ -3,20 +3,17 @@ import urllib.error
 from bs4 import BeautifulSoup
 from Frontier import Frontier
 import pprint
+from PageRank2 import toMatrix
+from PageRank2 import pageRank
 # import html.parser
 from html.parser import HTMLParser
+from urllib.parse import urljoin
 
 dataFromSite = []
 
-
-# class myHtmlParser(HTMLParser):
-#     def handle_data(self, data):
-#         if data != '/n':
-#             dataFromSite.append(data)
-#
-# myParsInstance = myHtmlParser()
-
-# fromUser = input('Which one?\n')
+isNotTest = input('Is it testMode? \n yes or no \n')
+switcher = {'yes': True, 'no': False}
+isNotTest = switcher.get(isNotTest.lower(), True)
 
 
 def getUrl(number):
@@ -25,7 +22,7 @@ def getUrl(number):
 
 
 def getAllUrl():
-    return [getUrl(1), getUrl(4), getUrl(8)]
+    return [getUrl(1), getUrl(6), getUrl(8)]
 
 
 def readUrl(url):
@@ -42,10 +39,10 @@ def readUrl(url):
 #     print(e.reason)
 
 # html = handle.read(getUrl(fromUser))
-soup = readUrl(getUrl(fromUser))
+# soup = readUrl(getUrl(fromUser))
 
 # Retrieve all of the anchor tags
-tags = soup.get_text()
+# tags = soup.get_text()
 
 
 def getText():
@@ -59,19 +56,30 @@ urls = getAllUrl()
 myFrontier = Frontier(getAllUrl())
 
 
-def createLinksStructure(froniter):
+def getDocFromUrl(url):
+    # TODO: should check if the url from current Page
+    # return url.split('/').pop().split('.').pop(0)
+    return url.split('/').pop()
+
+
+def createLinksStructure(frontier):
     linkStructure = {}
 
     def addLinks(soupLinks, page):
         linkStructure[page] = {}
         for link in soupLinks:
             href = link.get('href')
+            # add next Link for Parse
+            frontier.addLink(urljoin(page, href))
             if(href not in linkStructure[page]):
                 linkStructure[page][href] = 1
             else:
                 linkStructure[page][href] += 1
+        if(isNotTest):
+            newPage = getDocFromUrl(page)
+            linkStructure[newPage] = linkStructure.pop(page)
 
-    for page in froniter.forParsing:
+    for page in frontier.forParsing:
         soup = readUrl(page)
         soupLinks = soup.find_all('a')
         addLinks(soupLinks, page)
@@ -80,14 +88,8 @@ def createLinksStructure(froniter):
 linkStructure = createLinksStructure(myFrontier)
 
 
-pprint.pprint(linkStructure)
-
-
-# for i in range(count):
-#     tempUrl = tags[position].get('href')
-#     print('Retriving ' + str(tempUrl))
-#     tempSoup = readUrl(tempUrl)
-#     tags = tempSoup.find_all('a')
-# myParsInstance.feed(html)
-# myParsInstance.close()
-# print(html)
+# pprint.pprint(linkStructure)
+matrix = toMatrix(linkStructure)
+pr = pageRank(matrix)
+pprint.pprint(matrix)
+pprint.pprint(pr)
