@@ -3,11 +3,12 @@ import urllib.error
 from bs4 import BeautifulSoup
 from Frontier import Frontier
 import pprint
-from PageRank2 import toMatrix
-from PageRank2 import pageRank
+from PageRank import toMatrix
+from PageRank import pageRank
 # import html.parser
 from html.parser import HTMLParser
 from urllib.parse import urljoin
+from Indexing import Indexing
 
 dataFromSite = []
 
@@ -53,6 +54,7 @@ def getText():
     return textFromSite
 
 urls = getAllUrl()
+myIndexing = Indexing()
 myFrontier = Frontier(getAllUrl())
 
 
@@ -81,6 +83,7 @@ def createLinksStructure(frontier):
 
     for page in frontier.forParsing:
         soup = readUrl(page)
+        myIndexing.addDoc(page, soup)
         soupLinks = soup.find_all('a')
         addLinks(soupLinks, page)
 
@@ -88,8 +91,7 @@ def createLinksStructure(frontier):
 linkStructure = createLinksStructure(myFrontier)
 
 
-# pprint.pprint(linkStructure)
 matrix = toMatrix(linkStructure)
 pr = pageRank(matrix)
-pprint.pprint(matrix)
-pprint.pprint(pr)
+myIndexing.start()
+myIndexing.printTerms()
