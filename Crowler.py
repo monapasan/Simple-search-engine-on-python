@@ -2,19 +2,24 @@ import urllib.request
 import urllib.error
 from bs4 import BeautifulSoup
 from Frontier import Frontier
-import pprint
+from pprint import pprint
 from PageRank import toMatrix
 from PageRank import pageRank
 # import html.parser
 from html.parser import HTMLParser
 from urllib.parse import urljoin
 from Indexing import Indexing
-
+from Scoring import Scoring
 dataFromSite = []
 
 isNotTest = input('Is it testMode? \n yes or no \n')
 switcher = {'yes': True, 'no': False}
 isNotTest = switcher.get(isNotTest.lower(), True)
+
+stopWordsPath = './stop_words.txt'
+stopWords = open(stopWordsPath).read()
+stopWords = stopWords.replace('\n', " ").replace("'", "").replace(',', '')
+stopWords = ' '.join(stopWords.split()).split(' ')
 
 
 def getUrl(number):
@@ -54,7 +59,7 @@ def getText():
     return textFromSite
 
 urls = getAllUrl()
-myIndexing = Indexing()
+myIndexing = Indexing(stopWords)
 myFrontier = Frontier(getAllUrl())
 
 
@@ -95,3 +100,11 @@ matrix = toMatrix(linkStructure)
 pr = pageRank(matrix)
 myIndexing.start()
 myIndexing.printTerms()
+# Number of Documents
+N = len(myIndexing.docs)
+pprint(N)
+myScoring = Scoring(myIndexing.terms, N)
+myScoring.printWeights()
+pprint(myScoring.cosineScore('classification'))
+# pprint(myScoring.terms)
+# pprint(myScoring.immitateTerms(['a', 'a', 'asd', 'token']))
