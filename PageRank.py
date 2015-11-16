@@ -18,7 +18,12 @@ def toMatrix(struct):
     # TEST: k =
     # np.array([[0,1,1,1,0],[0,0,1,0,1],[0,0,0,1,1],[0,0,1,0,0],[0,0,0,0,0]])
     # pprint(pageRank(M))
-    return matrix
+    pr = pageRank(matrix)
+    pprint(pr)
+    results = {}
+    for i, doc in enumerate(sKs):
+        results[doc] = pr[i]
+    return results
 
 
 def pageRank(matrix, d = 0.95, delta = 0.04):
@@ -33,7 +38,8 @@ def pageRank(matrix, d = 0.95, delta = 0.04):
     sparseM.data /= rsums[sparseM.indices]
     adjazentM = sparseM.toarray()
     # if the whole row give the sum = 0
-    # we have to change it to 1/n
+    # teleport probability will be 1/n
+    # n is demension of matrix
     adjazentM[rsums == 0] = np.full_like(adjazentM[rsums == 0], 1 / n)
     # exclude zeros and generate new values, because we don't want have zeros
     for v in np.nditer(adjazentM, op_flags=['readwrite']):

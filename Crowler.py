@@ -96,15 +96,21 @@ def createLinksStructure(frontier):
 linkStructure = createLinksStructure(myFrontier)
 
 
-matrix = toMatrix(linkStructure)
-pr = pageRank(matrix)
+pr = toMatrix(linkStructure)
+# pr = pageRank(matrix)
+pprint(pr)
 myIndexing.start()
 myIndexing.printTerms()
 # Number of Documents
 N = len(myIndexing.docs)
 pprint(N)
 myScoring = Scoring(myIndexing.terms, N)
-myScoring.printWeights()
-pprint(myScoring.cosineScore('classification'))
+# myScoring.printWeights()
+scores = myScoring.cosineScore('tokens')
+pprint('Without Ranking: ')
+pprint(scores)
+pprint('With Ranking: ')
+pprint(myScoring.combineWithRanking(pr, scores))
+
 # pprint(myScoring.terms)
 # pprint(myScoring.immitateTerms(['a', 'a', 'asd', 'token']))

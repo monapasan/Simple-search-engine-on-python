@@ -22,11 +22,11 @@ class Scoring(object):
                 self.lengths[doc] = self.lengths.get(doc, 0) + math.pow(weight, 2)
                 # pprint(weight)
                 self.weightTerms[word][doc] = round(weight, 4)
+        for key in self.lengths:
+            self.lengths[key] = round(math.sqrt(self.lengths[key]), 6)
 
     def printWeights(self):
         # self.lengths = np.sqrt(self.lengths.values())
-        for key in self.lengths:
-            self.lengths[key] = round(math.sqrt(self.lengths[key]), 6)
         pprint(self.weightTerms)
         pprint(self.lengths)
     # def produceLengths(self):
@@ -51,16 +51,22 @@ class Scoring(object):
         scores = {}
         queryArr = query.split(' ')
         qWeights = self.immitateTerms(queryArr)
-        print(qWeights)
         for qTerm in qWeights:
             for term in self.weightTerms:
                 # if qTerm in self.weightTerms:
                 if qTerm == term:
                     for doc in self.weightTerms[qTerm]:
                         scores[doc] = scores.get(doc, 0) + self.weightTerms[qTerm][doc] * qWeights[qTerm]
-                        pprint(qTerm)
-                        # pprint(self.weightTerms[qTerm][doc])
         for doc in scores:
-            pprint(self.lengths[doc])
-            scores[doc] = scores[doc] / self.lengths[doc]
+            scores[doc] = round(scores[doc] / self.lengths[doc], 5)
+        return scores
+
+    def combineWithRanking(self, ranking, scores):
+        #  based on harmonic mean of two numbers
+        #  src:
+        #  https://en.wikipedia.org/wiki/Harmonic_mean#Harmonic_mean_of_two_numbers
+        for doc in scores:
+            x1 = ranking.get(doc, 0)
+            x2 = scores[doc]
+            scores[doc] = 2 * (x1 * x2) / (x1 + x2)
         return scores
