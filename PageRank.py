@@ -19,7 +19,7 @@ def toMatrix(struct):
     # np.array([[0,1,1,1,0],[0,0,1,0,1],[0,0,0,1,1],[0,0,1,0,0],[0,0,0,0,0]])
     # pprint(pageRank(M))
     pr = pageRank(matrix)
-    pprint(pr)
+    # pprint(pr)
     results = {}
     for i, doc in enumerate(sKs):
         results[doc] = pr[i]
