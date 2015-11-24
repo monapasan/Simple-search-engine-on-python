@@ -1,0 +1,20 @@
+{
+  "name": "ultimate-flask-front-end-1",
+  "version": "1.0.0",
+  "description": "simply search engine",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "monapasan",
+  "license": "MIT",
+  "devDependencies": {
+    "bower": "^1.6.5",
+    "gulp": "^3.9.0",
+    "gulp-browserify": "^0.5.1",
+    "gulp-clean": "^0.3.1",
+    "gulp-size": "^1.2.1",
+    "react": "^0.12.2",
+    "reactify": "^1.0.0"
+  }
+}
