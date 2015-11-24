@@ -55,7 +55,7 @@
         return (
           React.createElement("div", null, 
             React.createElement("input", {type: "text", value: this.state.searchString, onChange: this.handleChange, placeholder: "Search!"}), 
-            React.createElement("button", {onClick: this.handleSearch}, "My Button"), 
+            React.createElement("button", {onClick: this.handleSearch}, " Search "), 
             React.createElement("ul", null, 
               WithRanking.map(function(res, i){
                   return React.createElement("li", null, res[0], 

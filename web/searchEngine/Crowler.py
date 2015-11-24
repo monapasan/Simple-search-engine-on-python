@@ -71,7 +71,7 @@ def startSearching(query):
     # switcher = {'yes': True, 'no': False}
     # isNotTest = switcher.get(isNotTest.lower(), True)
     isNotTest = True
-    stopWordsPath = 'searchEngine/stop_words.txt'
+    stopWordsPath = 'web/searchEngine/stop_words.txt'
     stopWords = open(stopWordsPath).read()
     stopWords = stopWords.replace('\n', " ").replace("'", "").replace(',', '')
     stopWords = ' '.join(stopWords.split()).split(' ')

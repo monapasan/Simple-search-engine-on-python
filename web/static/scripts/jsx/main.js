@@ -54,7 +54,7 @@
         return (
           <div>
             <input type="text" value={this.state.searchString} onChange={this.handleChange} placeholder="Search!" />
-            <button  onClick={this.handleSearch}>My Button</button>
+            <button  onClick={this.handleSearch}> Search </button>
             <ul>
               {WithRanking.map(function(res, i){
                   return <li>{res[0]}
