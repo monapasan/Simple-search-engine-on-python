@@ -4,6 +4,10 @@
 
         pip install -r requirements.txt
 
+ * install node dependencies
+
+        npm install
+
  * install js dependencies
 
         bower install
