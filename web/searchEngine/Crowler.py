@@ -106,6 +106,8 @@ def getLinkStruktur():
 def getPageRank():
     return pr
 
+def getTerms():
+    return myIndexing.terms
 
 def startSearching(query):
     # myScoring.printWeights()

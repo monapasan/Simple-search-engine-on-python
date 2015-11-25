@@ -4,6 +4,7 @@ from flask import json
 from flask import Response
 from flask import jsonify
 from flask.ext.restplus import Api, Resource, apidoc
+import pprint
 import initSearch
 app = Flask(__name__)
 
@@ -13,7 +14,7 @@ createParser = api.parser()
 createParser.add_argument('query', type=str)
 createParser.add_argument('command', type=str)
 
-
+# print(initSearch.getterms())
 @api.route('/')
 class Index(Resource):
     @api.doc(parser=createParser)

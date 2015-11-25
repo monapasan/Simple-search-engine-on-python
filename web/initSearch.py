@@ -16,5 +16,8 @@ def getlinkstruktur():
 def getpagerank():
     return Crowler.getPageRank()
 
+def getterms():
+    return Crowler.getTerms()
 
+print(Crowler.startSearching('tokens classification'))
 # startSearching("tokens")

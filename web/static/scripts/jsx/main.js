@@ -29,7 +29,8 @@
           var commands = {
               'getlength': true,
               'getlinkstruktur': true,
-              'getpagerank': true
+              'getpagerank': true,
+              'getterms' : true
           };
           if(!commands[command])
               this.setState({commandResults: false});
