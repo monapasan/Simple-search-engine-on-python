@@ -11,6 +11,9 @@ blueprint = Blueprint('api', __name__)
 api = Api(blueprint, title='Tasks API', ui=False)
 createParser = api.parser()
 createParser.add_argument('query', type=str)
+createParser.add_argument('command', type=str)
+
+
 @api.route('/')
 class Index(Resource):
     @api.doc(parser=createParser)
@@ -19,12 +22,15 @@ class Index(Resource):
         Create new task
         """
         args = createParser.parse_args()
+        print(args['command'])
         print(args['query'])
-        searchRes = initSearch.startSearch(str(args['query']))
-        resp = jsonify(searchRes)
+        if args['command'] != None:
+            method = getattr(initSearch, str(args['command']))
+            result = method()
+        else:
+            result = initSearch.startSearch(str(args['query']))
+        resp = jsonify(result)
         resp.status_code = 200
-        # task_id = str(uuid.uuid4())
-        # TASKS[task_id] = {'task_id': task_id, 'label': args['label'], 'position': len(TASKS), 'completed': 0}
         return resp
 
 

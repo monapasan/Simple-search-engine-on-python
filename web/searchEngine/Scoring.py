@@ -92,3 +92,6 @@ class Scoring(object):
     def sortScore(self, scores):
         sorted_score = sorted(scores.items(), key=operator.itemgetter(1), reverse=True)
         return sorted_score
+
+    def getLengthOfDocs(self):
+        return self.lengths

@@ -1,6 +1,7 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /** @jsx React.DOM */
 
+
     var DynamicSearch = React.createClass({displayName: "DynamicSearch",
 
       // sets initial state
@@ -16,13 +17,32 @@
       handleSearch:function(){
           var searchString = this.state.searchString.trim().toLowerCase();
           console.log(searchString);
-          this.handleTaskSubmit(searchString);
+          var command;
+          if(searchString.indexOf(':') === 0){
+              command = searchString.split(':')[1].toLowerCase();
+              this.handleCommandSearch(command);
+          } else {
+              this.setState({command: false});
+              this.handleSubmit({'query': searchString});
+          }
       },
-      handleTaskSubmit: function (searchString) {
+      handleCommandSearch: function(command){
+          var commands = {
+              'getlength': true,
+              'getlinkstruktur': true,
+              'getpagerank': true
+          };
+          if(!commands[command])
+              this.setState({commandResults: false});
+          else
+              this.handleSubmit({command: command});
+          this.setState({command: command});
+      },
+      handleSubmit: function (data) {
           $.ajax({
               type: "POST",
               url: '/',
-              data: {'query': searchString},
+              data: data,
               success: this.successQuery,
               error: function (xhr, status, err) {
                   console.error( status, err.toString());
@@ -30,60 +50,93 @@
           });
       },
       successQuery:function(data){
-          this.setState({searchResults: data});
+          if(this.state.command){
+              this.setState({commandResults: data});
+              console.log(data);
+          }else{
+              this.setState({searchResults: data});
+          }
+      },
+      renderSearchResults:function(){
+          var withRanking = [];
+          var cosineScore = [];
+          var pageRank = [];
+          // TODO: What the fuck !? Change in python!!
+          var linkPath = 'http://people.f4.htw-berlin.de/fileadmin/user_upload/Dozenten/WI-Dozenten/Classen/DAWeb/smdocs/';
+          if(this.state.searchResults){
+              withRanking = this.state.searchResults.WithRanking;
+              cosineScore = this.state.searchResults.CosineScore;
+              pageRank = this.state.searchResults.PageRank;
+          }
+          cosineScoreObj = {};
+          cosineScore.map(function(val){
+              cosineScoreObj[val[0]] = val[1];
+          });
+         return( React.createElement("ul", null, 
+            withRanking.map(function(res, i){
+                return React.createElement("li", null, React.createElement("div", {className: "res-name"}, React.createElement("a", {target: "_blank", href: linkPath + res[0]}, res[0])), 
+                  React.createElement("div", {className: "res-score"}, 
+                      React.createElement("p", null, "Score with withRanking :", React.createElement("span", {className: "score-value"}, " ", res[1])), 
+                      React.createElement("p", null, "PageRank : ", React.createElement("span", {className: "score-value"}, pageRank[res[0]])), 
+                      React.createElement("p", null, "CosineScore : ", React.createElement("span", {className: "score-value"}, cosineScoreObj[res[0]]))
+                  )
+                  );
+            })
+          ));
+      },
+      renderCommandResults: function(){
+          var data = this.state.commandResults;
+          if(!data){
+              return (React.createElement("h3", null, "Wrong command!"));
+          } else if (this.state.command === 'getlinkstruktur'){
+              return this.renderPageRankResults(data, true);
+          } else {
+              return this.renderPageRankResults(data);
+          }
+      },
+      renderPageRankResults:function(data, linkStructure){
+          var dataArr = [];
+          if(linkStructure === true){
+              for(var i in data){
+                var str = "";
+                for(var link in data[i])
+                    str += link + " ";
+                dataArr.push([i,str]);
+              }
+          }
+          else {
+              for(var key in data)
+                  dataArr.push([key,data[key]]);
+          }
+          return(React.createElement("ul", {className: "pagerank"}, 
+              dataArr.map(function(val){
+                  return React.createElement("li", null, val[0], " : ", React.createElement("div", {className: "pagerankval"}, val[1]));
+              })
+          ));
+      },
+      showResults:function(){
+          if(this.state.command)
+              return this.renderCommandResults();
+          else if (this.state.searchResults)
+              return this.renderSearchResults();
       },
       render: function() {
 
-        var countries = this.props.items;
         var searchString = this.state.searchString.trim().toLowerCase();
-        var WithRanking = [];
-        var CosineScore = [];
-        var PageRank = [];
-        if(this.state.searchResults){
-            WithRanking = this.state.searchResults.WithRanking;
-            CosineScore = this.state.searchResults.CosineScore;
-            PageRank = this.state.searchResults.PageRank;
-        }
-        //   { countries.map(function(country){ return <li>{country.name} </li>; }) }
 
-        // filter countries list by value from input box
-        if(searchString.length > 0){
-          countries = countries.filter(function(country){
-            return country.name.toLowerCase().match( searchString );
-          });
-        }
         return (
           React.createElement("div", null, 
             React.createElement("input", {type: "text", value: this.state.searchString, onChange: this.handleChange, placeholder: "Search!"}), 
-            React.createElement("button", {onClick: this.handleSearch}, " Search "), 
-            React.createElement("ul", null, 
-              WithRanking.map(function(res, i){
-                  return React.createElement("li", null, res[0], 
-                    React.createElement("p", null, "WithRanking : ", res[1]), 
-                    React.createElement("p", null, "PageRank : ", PageRank[res[0]]), 
-                    React.createElement("p", null, "CosineScore : ", CosineScore[i][1])
-                    );
-              })
-            )
+            React.createElement("button", {className: "search-button", onClick: this.handleSearch}, " Search "), 
+            this.showResults()
           )
       );
       }
 
     });
 
-    // list of countries, defined with JavaScript object literals
-    var countries = [
-      {"name": "Sweden"}, {"name": "China"}, {"name": "Peru"}, {"name": "Czech Republic"},
-      {"name": "Bolivia"}, {"name": "Latvia"}, {"name": "Samoa"}, {"name": "Armenia"},
-      {"name": "Greenland"}, {"name": "Cuba"}, {"name": "Western Sahara"}, {"name": "Ethiopia"},
-      {"name": "Malaysia"}, {"name": "Argentina"}, {"name": "Uganda"}, {"name": "Chile"},
-      {"name": "Aruba"}, {"name": "Japan"}, {"name": "Trinidad and Tobago"}, {"name": "Italy"},
-      {"name": "Cambodia"}, {"name": "Iceland"}, {"name": "Dominican Republic"}, {"name": "Turkey"},
-      {"name": "Spain"}, {"name": "Poland"}, {"name": "Haiti"}
-    ];
-
     React.render(
-      React.createElement(DynamicSearch, {items:  countries }),
+      React.createElement(DynamicSearch, null),
       document.getElementById('main')
     );
 

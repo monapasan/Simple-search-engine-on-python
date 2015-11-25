@@ -1,7 +1,20 @@
-import sys
-from searchEngine.Crowler import startSearching
+import searchEngine.Crowler as Crowler
 
 
 def startSearch(query):
-    return startSearching(query)
+    return Crowler.startSearching(query)
+
+
+def getlength():
+    return Crowler.getLength()
+
+
+def getlinkstruktur():
+    return Crowler.getLinkStruktur()
+
+
+def getpagerank():
+    return Crowler.getPageRank()
+
+
 # startSearching("tokens")
