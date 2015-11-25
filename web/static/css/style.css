@@ -1,0 +1,61 @@
+/* custom styles */
+/* custom styles */
+
+.container {
+  text-align: center;
+  padding-top: 50px;
+  max-width: 600px;
+}
+
+input{
+  text-align: center;
+  border: 5px solid;
+  padding: 13px 12px;
+  font-size: 16px;
+  outline: none;
+  margin-bottom: 20px;
+}
+.search-button{
+    margin-left: 20px;
+    border-style: solid;
+    border- width: 0px 0px 3px;
+    box-shadow: 0 -1px 0 rgba(255, 255, 255, 0.1) inset;
+    color: #353333;
+    cursor: pointer;
+    display: inline-block;
+    font-style: normal;
+    overflow: hidden;
+    text-align: center;
+    text-decoration: none;
+    text-overflow: ellipsis;
+    transition: all 200ms ease-in-out 0s;
+    white-space: nowrap;
+    font-family: "Gotham Rounded A","Gotham Rounded B",Helvetica,Arial,sans-serif;
+    font-weight: 700;
+    padding: 16px 39px 16px;
+    font-size: 18px;
+    background-color: darkseagreen;
+}
+ul{
+  margin-left: 20px;
+  text-align: left;
+}
+.pagerank{
+    font-size: 20px;
+}
+.res-name{
+    font-size: x-large;
+}
+.res-score{
+    font-size: larger;
+    padding-left: 40px;
+}
+.score-value {
+    color:#E04444;;
+    font-style: italic;
+    font-weight: bold;
+}
+.pagerankval{
+    font-weight: bold;
+    display: inline;
+}
