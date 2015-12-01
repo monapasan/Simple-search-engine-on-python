@@ -61,8 +61,8 @@ def createLinksStructure(frontier):
             else:
                 linkStructure[page][href] += 1
         if(isNotTest):
-            # newPage = getDocFromUrl(page)
-            linkStructure[page] = linkStructure.pop(page)
+            newPage = getDocFromUrl(page)
+            linkStructure[newPage] = linkStructure.pop(page)
 
     for page in frontier.forParsing:
         soup = readUrl(page)
