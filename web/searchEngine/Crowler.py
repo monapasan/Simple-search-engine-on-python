@@ -10,16 +10,18 @@ from html.parser import HTMLParser
 from urllib.parse import urljoin
 from searchEngine.Indexing import Indexing
 from searchEngine.Scoring import Scoring
+import os
 dataFromSite = []
 
-
-def getUrl(number):
-    return 'http://people.f4.htw-berlin.de/fileadmin/user_upload/Dozenten'\
-        '/WI-Dozenten/Classen/DAWeb/smdocs/d0' + str(number) + '.html'
-
-
-def getAllUrl():
-    return [getUrl(1), getUrl(6), getUrl(8)]
+# read text files
+# stop words will be avoided by Indexing
+# urls will be crowl by Crowler
+stopWordsPath = os.path.join(os.path.dirname(__file__), "stop_words.txt")
+urlsToCrowlPath = os.path.join(os.path.dirname(__file__), "urlsToCrowl.txt")
+urls = open(urlsToCrowlPath).read().split()
+stopWords = open(stopWordsPath).read()
+stopWords = stopWords.replace('\n', " ").replace("'", "").replace(',', '')
+stopWords = ' '.join(stopWords.split()).split(' ')
 
 
 def readUrl(url):
@@ -59,8 +61,8 @@ def createLinksStructure(frontier):
             else:
                 linkStructure[page][href] += 1
         if(isNotTest):
-            newPage = getDocFromUrl(page)
-            linkStructure[newPage] = linkStructure.pop(page)
+            # newPage = getDocFromUrl(page)
+            linkStructure[page] = linkStructure.pop(page)
 
     for page in frontier.forParsing:
         soup = readUrl(page)
@@ -70,28 +72,16 @@ def createLinksStructure(frontier):
 
     return linkStructure
 
-# isNotTest = input('Is it testMode? \n yes or no \n')
-# switcher = {'yes': True, 'no': False}
-# isNotTest = switcher.get(isNotTest.lower(), True)
 isNotTest = True
-stopWordsPath = 'web/searchEngine/stop_words.txt'
-stopWords = open(stopWordsPath).read()
-stopWords = stopWords.replace('\n', " ").replace("'", "").replace(',', '')
-stopWords = ' '.join(stopWords.split()).split(' ')
-urls = getAllUrl()
+
 myIndexing = Indexing(stopWords)
-myFrontier = Frontier(getAllUrl())
+myFrontier = Frontier(urls)
 linkStructure = createLinksStructure(myFrontier)
 
 pr = toMatrix(linkStructure)
-# pr = pageRank(matrix)
-pprint('PageRank: ')
-pprint(pr)
 myIndexing.start()
-myIndexing.printTerms()
 # Number of Documents
 N = len(myIndexing.docs)
-pprint(N)
 myScoring = Scoring(myIndexing.terms, N)
 
 
@@ -107,21 +97,15 @@ def getPageRank():
     return pr
 
 
+def getTerms():
+    return myIndexing.terms
+
+
 def startSearching(query):
-    # myScoring.printWeights()
     scores = myScoring.calculateCosineScore(query)
     myScoring.combineWithRanking(pr)
     res = {}
-    pprint(query)
-    # pprint('Without Ranking: ')
-    pprint(scores)
-    pprint(myScoring.getCosineScores())
-    # pprint('With Ranking:')
-    pprint(myScoring.getScoresWithRanking())
     res['PageRank'] = pr
     res['CosineScore'] = myScoring.getCosineScores()
     res['WithRanking'] = myScoring.getScoresWithRanking()
     return res
-
-# pprint(myScoring.terms)
-# pprint(myScoring.immitateTerms(['a', 'a', 'asd', 'token']))

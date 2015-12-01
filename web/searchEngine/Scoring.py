@@ -23,17 +23,13 @@ class Scoring(object):
             # inverse document frequency
             idf = math.log10(self.N / df)
             for doc in self.terms[term]:
-                weight = (1 + math.log10(self.terms[term][doc])) * idf
+                tf = self.terms[term][doc]
+                weight = (1 + math.log10(tf)) * idf
                 # count length of document to normalizing later
                 self.lengths[doc] = self.lengths.get(doc, 0) + math.pow(weight, 2)
-                self.weightTerms[word][doc] = round(weight, 4)
+                self.weightTerms[word][doc] = round(weight, 6)
         for key in self.lengths:
             self.lengths[key] = round(math.sqrt(self.lengths[key]), 6)
-
-    def printWeights(self):
-        # self.lengths = np.sqrt(self.lengths.values())
-        pprint(self.weightTerms)
-        pprint(self.lengths)
 
     # count terms in query
     # and do scoring
@@ -41,26 +37,26 @@ class Scoring(object):
         terms = {}
         for token in queryArr:
             terms[token] = terms.get(token, 0) + 1
-        pprint(terms)
         weights = {}
         for token in terms:
-            df = terms[token] / len(terms)
-            idf = math.log10(1 / df)
-            weights[token] = (1 + math.log10(df))
+            tf = terms[token]
+            for term in self.terms:
+                word = term[0]
+                df = term[1]
+                if(word == token):
+                    idf = math.log10(self.N / df)
+                    weights[token] = (1 + math.log10(tf)) * idf
         return weights
 
     def calculateQueryLength(self, weights):
         weightList = list(weights.values())
-        pprint(weightList)
         return math.sqrt(sum([pow(weight, 2) for weight in weightList]))
 
     def calculateCosineScore(self, query):
         scores = {}
         queryArr = query.split()
         qWeights = self.immitateTerms(queryArr)
-        pprint(qWeights)
         qLength = self.calculateQueryLength(qWeights)
-        pprint(self.weightTerms)
         for qTerm in qWeights:
             if qTerm in self.weightTerms:
                 for doc in self.weightTerms[qTerm]:

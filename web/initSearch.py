@@ -17,4 +17,5 @@ def getpagerank():
     return Crowler.getPageRank()
 
 
-# startSearching("tokens")
+def getterms():
+    return Crowler.getTerms()

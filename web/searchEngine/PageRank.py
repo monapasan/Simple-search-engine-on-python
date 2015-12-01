@@ -41,7 +41,8 @@ def pageRank(matrix, d = 0.95, delta = 0.04):
     # teleport probability will be 1/n
     # n is demension of matrix
     adjazentM[rsums == 0] = np.full_like(adjazentM[rsums == 0], 1 / n)
-    # exclude zeros and generate new values, because we don't want have zeros
+    # V * d probability to choose this link
+    # t / n probability to make teleport to this links
     for v in np.nditer(adjazentM, op_flags=['readwrite']):
         # from lesson
         v[...] = v * d + t / n
