@@ -31,11 +31,6 @@ class Scoring(object):
         for key in self.lengths:
             self.lengths[key] = round(math.sqrt(self.lengths[key]), 6)
 
-    def printWeights(self):
-        # self.lengths = np.sqrt(self.lengths.values())
-        pprint(self.weightTerms)
-        pprint(self.lengths)
-
     # count terms in query
     # and do scoring
     def immitateTerms(self, queryArr):

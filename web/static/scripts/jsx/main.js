@@ -13,6 +13,10 @@
         // grab value form input box
         this.setState({searchString:event.target.value});
       },
+      handleEnterPress:function(e){
+          if(e.key === "Enter")
+            this.handleSearch();
+      },
       handleSearch:function(){
           var searchString = this.state.searchString.trim().toLowerCase();
           console.log(searchString);
@@ -72,6 +76,8 @@
           cosineScore.map(function(val){
               cosineScoreObj[val[0]] = val[1];
           });
+          if(!withRanking.length)
+              return (<h3 className="no-results">Your search "{this.state.searchString}" did not match any documents.</h3>);
          return( <ul>
             {withRanking.map(function(res, i){
                 return <li><div className="res-name"><a target="_blank" href={linkPath + res[0]}>{res[0]}</a></div>
@@ -126,7 +132,7 @@
 
         return (
           <div>
-            <input type="text" value={this.state.searchString} onChange={this.handleChange} placeholder="Search!" />
+            <input type="text" onKeyPress={this.handleEnterPress}value={this.state.searchString} onChange={this.handleChange} placeholder="Search!" />
             <button  className='search-button' onClick={this.handleSearch}> Search </button>
             {this.showResults()}
           </div>

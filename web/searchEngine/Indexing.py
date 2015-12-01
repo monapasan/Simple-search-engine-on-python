@@ -10,6 +10,7 @@ class Indexing(object):
     def start(self):
         self.minifyDocs()
         self.tokenize()
+        self.buildDocFreq()
 
     def minifyDocs(self):
         self.minDocs = {}
@@ -19,7 +20,6 @@ class Indexing(object):
             key = name[1].split('/')[-1]
             # key = name[0]
             self.minDocs[key] = self.docs[name[1]]
-        # pprint(self.minDocs)
 
     def addDoc(self, page, soup):
         if(page not in self.docs):
@@ -61,9 +61,3 @@ class Indexing(object):
 
     def getTerms(self):
         return self.terms
-
-    def printTerms(self):
-        # pprint(self.terms)
-        # pprint(len(self.terms))
-        self.buildDocFreq()
-        # pprint(self.terms)
